@@ -1,0 +1,15 @@
+Mini Project
+
+Music Streaming Service
+
+Load 5 music on server and stream at frontend, no auth, no flashy design just list and on click play the music
+
+At Backend 
+
+1. GET API to handle the stream request by ID
+2. GET API for listing the Songs Available inside the songs folder.
+3. (Optional) API to upload the song.
+
+At Frontend (REACT)
+1. One component for song listing.
+2. On click of the item from listing, trigger the GET stream API and play the song.
