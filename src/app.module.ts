@@ -11,11 +11,16 @@ import { SongsController } from './songs/songs.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Song } from './songs/songs.entity';
 import { DataSource } from 'typeorm';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { ConfigModule } from '@nestjs/config';
+import { User } from './users/users.entity';
 
 @Module({
   imports: [
-    SongsModule,
-    PlaylistsModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DATABASE_HOST || 'localhost',
@@ -23,9 +28,13 @@ import { DataSource } from 'typeorm';
       username: process.env.DATABASE_USER || 'root',
       password: process.env.DATABASE_PASSWORD || 'root',
       database: process.env.DATABASE_NAME || 'hightunes',
-      entities: [Song],
+      entities: [Song, User],
       synchronize: true,
     }),
+    SongsModule,
+    PlaylistsModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController, SongsController, PlaylistsController],
   providers: [AppService, SongsService, PlaylistsService],
