@@ -9,12 +9,12 @@ import { PlaylistsModule } from './playlists/playlists.module';
 import { SongsService } from './songs/songs.service';
 import { SongsController } from './songs/songs.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Song } from './songs/songs.entity';
+import { Song } from './models/entities/songs.entity';
 import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
-import { User } from './users/users.entity';
+import { User } from './models/entities/users.entity';
 
 @Module({
   imports: [
@@ -28,7 +28,7 @@ import { User } from './users/users.entity';
       username: process.env.DATABASE_USER || 'root',
       password: process.env.DATABASE_PASSWORD || 'root',
       database: process.env.DATABASE_NAME || 'hightunes',
-      entities: [Song, User],
+      entities: ['dist/src/models/entities/*.entity{.ts,.js}'],
       synchronize: true,
     }),
     SongsModule,

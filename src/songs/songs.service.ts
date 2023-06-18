@@ -8,8 +8,7 @@ import { createReadStream, createWriteStream } from 'fs';
 let fs = require('fs');
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { Song } from './songs.entity';
-let data = JSON.parse(fs.readFileSync('./data/audio/index.json', 'utf8'));
+import { Song } from '../models/entities/songs.entity';
 
 import { SongEnum } from 'common';
 @Injectable()

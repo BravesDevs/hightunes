@@ -1,5 +1,5 @@
 import { Column, Entity, Index, OneToMany } from 'typeorm';
-import { Playlist } from '../playlists/playlists.entity';
+import { Playlist } from './playlists.entity';
 
 @Index('unique_username', ['name'], { unique: true })
 @Index('IDX_065d4d8f3b5adb4a08841eae3c', ['name'], { unique: true })

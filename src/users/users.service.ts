@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './users.entity';
+import { User } from '../models/entities/users.entity';
 import { DataSource, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
@@ -34,6 +34,7 @@ export class UsersService {
 
       return await this.userRepository.save(user);
     } catch (error) {
+      console.log(error);
       if (error.errno === 1062) {
         throw new ForbiddenException('User already exists');
       }
