@@ -1,37 +1,29 @@
-import { Column, Entity, Index } from 'typeorm';
+import { Column, Entity, Index } from "typeorm";
 
-@Index('unique_username', ['name'], { unique: true })
-@Entity('user')
+@Index("unique_username", ["name"], { unique: true })
+@Index("IDX_065d4d8f3b5adb4a08841eae3c", ["name"], { unique: true })
+@Index("user_unique_email", ["email"], { unique: true })
+@Index("IDX_e12875dfb3b1d92d7d7c5377e2", ["email"], { unique: true })
+@Entity("user")
 export class User {
-  @Column('decimal', {
-    primary: true,
-    name: 'id',
-    comment: 'User ID',
-    precision: 10,
-    scale: 0,
-  })
+  @Column("decimal", { primary: true, name: "id", precision: 10, scale: 0 })
   id: number;
 
-  @Column('varchar', {
-    name: 'name',
-    unique: true,
-    comment: 'User name',
-    length: 50,
-  })
+  @Column("varchar", { name: "name", unique: true, length: 50 })
   name: string;
 
-  @Column('varchar', { name: 'email', length: 100 })
+  @Column("varchar", { name: "email", unique: true, length: 100 })
   email: string;
 
-  @Column('varchar', { name: 'password', nullable: true, length: 40 })
+  @Column("longtext", { name: "password", nullable: true })
   password: string | null;
 
-  @Column('tinyint', { name: 'isPremium', width: 1, default: () => "'0'" })
+  @Column("tinyint", { name: "isPremium", width: 1, default: () => "'0'" })
   isPremium: boolean;
 
-  @Column('datetime', { name: 'createdAt', default: () => "'now()'" })
+  @Column("datetime", { name: "createdAt", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
 
-  @Column('tinyint', { name: 'isVerified', width: 1, default: () => "'0'" })
+  @Column("tinyint", { name: "isVerified", width: 1, default: () => "'0'" })
   isVerified: boolean;
 }

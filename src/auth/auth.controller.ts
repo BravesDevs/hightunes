@@ -21,6 +21,12 @@ export class AuthController {
     return await this.authService.login(data.email, data.password);
   }
 
+  @HttpCode(HttpStatus.CREATED)
+  @Post('register')
+  async register(@Body() data: Record<string, any>): Promise<any> {
+    return await this.authService.register(data);
+  }
+
   @UseGuards(AuthGuard)
   @Get('me')
   async me(@Request() req): Promise<any> {
