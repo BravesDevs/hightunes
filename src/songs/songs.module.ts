@@ -9,7 +9,7 @@ import { SongsService } from './songs.service';
 import { SongsController } from './songs.controller';
 import { SetHeaderMiddleware } from 'common/middleware/setheader.middleware';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Song } from '../models/entities/songs.entity';
+import { Song } from '../models';
 import { PlaylistsModule } from 'src/playlists/playlists.module';
 
 @Module({
