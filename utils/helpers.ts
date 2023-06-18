@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt';
 
 export const generateId = (): number => {
-  return Math.floor(Math.random() * 100000);
+  return Date.now() + Math.random()
 };
 
 export const generatePasswordHash = (password: string): string => {
