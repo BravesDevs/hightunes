@@ -11,12 +11,12 @@ export class Playlist {
   name: string | null;
 
   @Column('tinyint', {
-    name: 'in_association',
+    name: 'isAssociated',
     nullable: true,
     width: 1,
     default: () => "'0'",
   })
-  inAssociation: boolean | null;
+  isAssociated: boolean | null;
 
   @Column('decimal', {
     name: 'associatedWith',

@@ -6,7 +6,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../models';
 import { DataSource, Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 
 import { generateId, generatePasswordHash } from 'utils/helpers';
 @Injectable()
@@ -34,7 +33,6 @@ export class UsersService {
 
       return await this.userRepository.save(user);
     } catch (error) {
-      console.log(error);
       if (error.errno === 1062) {
         throw new ForbiddenException('User already exists');
       }
