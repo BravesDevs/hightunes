@@ -1,10 +1,15 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Playlist } from '../models';
 import { SongsService } from 'src/songs/songs.service';
+import { DataSource, Repository } from 'typeorm';
+import { generateId } from 'utils/helpers';
 let fs = require('fs');
 
 let albums = JSON.parse(fs.readFileSync('./data/audio/albums.json', 'utf8'));
@@ -12,30 +17,66 @@ let albums = JSON.parse(fs.readFileSync('./data/audio/albums.json', 'utf8'));
 @Injectable()
 export class PlaylistsService {
   private songs: any[] = [];
-  constructor(private readonly songsService: SongsService) {
+  constructor(
+    @InjectRepository(Playlist)
+    private playlistRepository: Repository<Playlist>,
+    private dataSource: DataSource,
+    private readonly songsService: SongsService,
+  ) {
     this.songsService.getSongs().then((data) => {
       this.songs = data;
     });
   }
 
-  createPlaylist(name: string): any {
-    let keys: number[] = Object.keys(albums).map((key) => parseInt(key));
-    let max = Math.max(...keys);
-    albums[max + 1] = name;
-    fs.writeFileSync('./data/audio/albums.json', JSON.stringify(albums));
-    return { data: albums };
+  async createPlaylist(user, name: string): Promise<any> {
+    try {
+      // Check if playlist already exists
+      if (
+        await this.playlistRepository.exist({
+          where: { name },
+        })
+      ) {
+        throw new ForbiddenException('Playlist already exists');
+      }
+
+      let playlist = this.playlistRepository.create({
+        id: generateId(),
+        name,
+        isAssociated: true,
+        associatedWith: user.sub,
+      });
+      this.playlistRepository.save(playlist);
+      return { data: playlist };
+    } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Something went wrong');
+    }
   }
 
-  deletePlaylist(id: number): any {
+  async deletePlaylist(user, id: number): Promise<any> {
     try {
-      if (!albums[id]) {
-        throw new NotFoundException('Playlist does not exist');
+      // Get User Playlists
+      let playlists: any = await this.playlistRepository.find({
+        select: ['id'],
+        where: { associatedWith: user.sub },
+      });
+
+      playlists = playlists.map((playlist) => parseInt(playlist.id));
+
+      if (!playlists.includes(id)) {
+        throw new BadRequestException('Playlist not found');
       }
-      delete albums[id];
-      fs.writeFileSync('./data/audio/albums.json', JSON.stringify(albums));
-      return { data: albums };
+
+      await this.playlistRepository.delete(id);
+
+      return { data: { message: 'Playlist deleted successfully' } };
     } catch (error) {
-      if (error instanceof NotFoundException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       } else {
         throw new InternalServerErrorException('Something went wrong');
@@ -43,8 +84,15 @@ export class PlaylistsService {
     }
   }
 
-  getPlaylists(): any {
-    return { data: albums };
+  async getPlaylists(user): Promise<any> {
+    try {
+      let playlists: any = await this.playlistRepository.find({
+        where: { associatedWith: user.sub },
+      });
+      return { data: playlists || [] };
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong');
+    }
   }
 
   addSongsInPlaylist(id: number, song: number): any {

@@ -6,27 +6,30 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  Request,
 } from '@nestjs/common';
-
+import { UseGuards } from '@nestjs/common';
 import { PlaylistsService } from './playlists.service';
+import { AuthGuard } from '../auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('songs/playlist')
 export class PlaylistsController {
   constructor(private readonly playlistsService: PlaylistsService) {}
 
   @Get()
-  getPlaylists(): any {
-    return this.playlistsService.getPlaylists();
+  async getPlaylists(@Request() req): Promise<any> {
+    return await this.playlistsService.getPlaylists(req.user);
   }
 
   @Post()
-  createPlaylist(@Query('name') name: string): any {
-    return this.playlistsService.createPlaylist(name);
+  createPlaylist(@Request() req, @Query('name') name: string): any {
+    return this.playlistsService.createPlaylist(req.user, name);
   }
 
   @Delete(':id')
-  deletePlaylist(@Param('id', ParseIntPipe) id: number): any {
-    return this.playlistsService.deletePlaylist(id);
+  deletePlaylist(@Request() req, @Param('id', ParseIntPipe) id: number): any {
+    return this.playlistsService.deletePlaylist(req.user,id);
   }
 
   @Post(':id')

@@ -33,6 +33,7 @@ export class AuthService {
         access_token: this.jwtService.sign(payload),
       };
     } catch (error) {
+      console.log(error);
       if (
         error instanceof NotFoundException ||
         error instanceof UnauthorizedException
