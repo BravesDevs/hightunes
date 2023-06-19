@@ -9,12 +9,14 @@ import { PlaylistsModule } from './playlists/playlists.module';
 import { SongsService } from './songs/songs.service';
 import { SongsController } from './songs/songs.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Song } from './songs/songs.entity';
 import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
-import { User } from './users/users.entity';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { UsersService } from './users/users.service';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -28,16 +30,36 @@ import { User } from './users/users.entity';
       username: process.env.DATABASE_USER || 'root',
       password: process.env.DATABASE_PASSWORD || 'root',
       database: process.env.DATABASE_NAME || 'hightunes',
-      entities: [Song, User],
+      entities: ['dist/src/models/entities/*.entity{.ts,.js}'],
       synchronize: true,
     }),
-    SongsModule,
-    PlaylistsModule,
+    JwtModule.registerAsync({
+      useFactory: () => ({
+        global: true,
+        signOptions: {
+          expiresIn: '1d',
+        },
+        secret: process.env.JWT_SECRET,
+      }),
+    }),
     AuthModule,
     UsersModule,
+    SongsModule,
+    PlaylistsModule,
   ],
-  controllers: [AppController, SongsController, PlaylistsController],
-  providers: [AppService, SongsService, PlaylistsService],
+  controllers: [
+    AppController,
+    SongsController,
+    PlaylistsController,
+    AuthController,
+  ],
+  providers: [
+    AppService,
+    SongsService,
+    PlaylistsService,
+    AuthService,
+    UsersService,
+  ],
 })
 export class AppModule implements NestModule {
   constructor(private dataSource: DataSource) {}

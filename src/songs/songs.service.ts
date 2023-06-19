@@ -8,10 +8,10 @@ import { createReadStream, createWriteStream } from 'fs';
 let fs = require('fs');
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { Song } from './songs.entity';
-let data = JSON.parse(fs.readFileSync('./data/audio/index.json', 'utf8'));
+import { Song } from '../models';
 
 import { SongEnum } from 'common';
+import { generateId } from 'utils/helpers';
 @Injectable()
 export class SongsService {
   constructor(
@@ -58,7 +58,7 @@ export class SongsService {
       }
 
       let result = await this.songRepository.save({
-        id: this.generateId(),
+        id: generateId(),
         name: file.originalname,
         fileSize: file.size,
         format: SongEnum[file.mimetype],
@@ -76,9 +76,5 @@ export class SongsService {
       }
       throw new InternalServerErrorException('Something went wrong');
     }
-  }
-
-  private generateId(): number {
-    return Math.floor(Math.random() * 100000);
   }
 }

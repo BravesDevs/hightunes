@@ -4,9 +4,8 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './users.entity';
+import { User } from '../models';
 import { DataSource, Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 
 import { generateId, generatePasswordHash } from 'utils/helpers';
 @Injectable()

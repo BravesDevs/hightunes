@@ -1,11 +1,17 @@
 import { Module, forwardRef } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Playlist } from '../models';
 
 import { SongsModule } from 'src/songs/songs.module';
+import { PlaylistSongs } from 'src/models/entities/playlistSongs.entity';
 
 @Module({
-  imports: [forwardRef(() => SongsModule)],
-  // imports: [SongsModule],
+  imports: [
+    TypeOrmModule.forFeature([Playlist, PlaylistSongs]),
+    forwardRef(() => SongsModule),
+  ],
   controllers: [],
   providers: [],
+  exports: [TypeOrmModule],
 })
 export class PlaylistsModule {}
