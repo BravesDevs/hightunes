@@ -10,6 +10,7 @@ import { Playlist } from '../models';
 import { SongsService } from 'src/songs/songs.service';
 import { DataSource, Repository } from 'typeorm';
 import { generateId } from 'utils/helpers';
+import { PlaylistSongs } from 'src/models/entities/playlistSongs.entity';
 let fs = require('fs');
 
 let albums = JSON.parse(fs.readFileSync('./data/audio/albums.json', 'utf8'));
@@ -20,13 +21,11 @@ export class PlaylistsService {
   constructor(
     @InjectRepository(Playlist)
     private playlistRepository: Repository<Playlist>,
+    @InjectRepository(PlaylistSongs)
+    private playlistSongsRepository: Repository<PlaylistSongs>,
     private dataSource: DataSource,
     private readonly songsService: SongsService,
-  ) {
-    this.songsService.getSongs().then((data) => {
-      this.songs = data;
-    });
-  }
+  ) {}
 
   async createPlaylist(user, name: string): Promise<any> {
     try {
@@ -95,47 +94,31 @@ export class PlaylistsService {
     }
   }
 
-  addSongsInPlaylist(id: number, song: number): any {
+  async addSongsInPlaylist(id: number, song: number): Promise<any> {
     try {
-      if (!albums[id]) {
+      let playlistDetails = await this.playlistRepository.findOne({
+        where: { id },
+      });
+      if (!playlistDetails) {
         throw new NotFoundException('Playlist does not exist');
       }
-      if (!this.songs[song]) {
+
+      let songDetails = await this.songsService.getSongInfo(song);
+      if (!songDetails) {
         throw new NotFoundException('Song does not exist');
       }
 
-      if (this.songs[song].playlist.includes(song)) {
+      try {
+        await this.playlistSongsRepository.save({
+          id: generateId(),
+          playlistId: id,
+          songId: song,
+        });
+      } catch (error) {
         throw new ForbiddenException('Song already exists in playlist');
       }
-      this.songs[song].playlist.push(song);
-      fs.writeFileSync('./data/audio/index.json', JSON.stringify(this.songs));
-      return { data: this.songs };
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException('Something went wrong');
-      }
-    }
-  }
 
-  removeSongsFromPlaylist(id: number, song: string): any {
-    try {
-      if (!albums[id]) {
-        throw new NotFoundException('Playlist does not exist');
-      }
-      if (!this.songs[song]) {
-        throw new NotFoundException('Song does not exist');
-      }
-
-      if (!this.songs[song].playlist.includes(id)) {
-        throw new ForbiddenException('Song does not exist in playlist');
-      }
-      this.songs[song].playlist = this.songs[song].playlist.filter(
-        (item) => item !== id,
-      );
-      fs.writeFileSync('./data/audio/index.json', JSON.stringify(this.songs));
-      return { data: this.songs };
+      return { data: { message: `Added in playlist ${playlistDetails.name}` } };
     } catch (error) {
       if (
         error instanceof NotFoundException ||
@@ -148,17 +131,55 @@ export class PlaylistsService {
     }
   }
 
-  getSongsFromPlaylist(id: string): any {
+  async removeSongsFromPlaylist(id: number, song: number): Promise<any> {
     try {
-      let keys = Object.keys(this.songs);
-      let songs = [];
-      keys.forEach((key) => {
-        if (this.songs[key].playlist.includes(parseInt(id))) {
-          songs.push(this.songs[key]);
-        }
+      let playlistDetails = await this.playlistRepository.findOne({
+        where: { id },
       });
+      if (!playlistDetails) {
+        throw new NotFoundException('Playlist does not exist');
+      }
 
-      return songs;
+      let songDetails = await this.songsService.getSongInfo(song);
+      if (!songDetails) {
+        throw new NotFoundException('Song does not exist');
+      }
+
+      try {
+        let result = await this.playlistSongsRepository.delete({
+          playlistId: id,
+          songId: song,
+        });
+        if (result.affected === 0) {
+          throw new BadRequestException('Song does not exist in playlist');
+        }
+      } catch (error) {
+        throw error;
+      }
+
+      return {
+        data: { message: `Removed from playlist ${playlistDetails.name}` },
+      };
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('Something went wrong');
+      }
+    }
+  }
+
+  async getSongsFromPlaylist(id: number): Promise<any> {
+    try {
+      return {
+        data: await this.dataSource.query(
+          `select id, name, fileSize from song where id in (select songId from playlistSongs where playlistId = ${id}) order by id asc`,
+        ),
+      };
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong');
     }

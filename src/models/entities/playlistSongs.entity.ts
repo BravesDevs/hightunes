@@ -10,10 +10,10 @@ export class PlaylistSongs {
   id: number;
 
   @Column('decimal', { name: 'playlistId', precision: 10, scale: 0 })
-  playlistId: string;
+  playlistId: number;
 
   @Column('decimal', { name: 'songId', precision: 10, scale: 0 })
-  songId: string;
+  songId: number;
 
   @ManyToOne(() => Playlist, (playlist) => playlist.playlistSongs, {
     onDelete: 'NO ACTION',

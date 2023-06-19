@@ -23,33 +23,41 @@ export class PlaylistsController {
   }
 
   @Post()
-  createPlaylist(@Request() req, @Query('name') name: string): any {
-    return this.playlistsService.createPlaylist(req.user, name);
+  async createPlaylist(
+    @Request() req,
+    @Query('name') name: string,
+  ): Promise<any> {
+    return await this.playlistsService.createPlaylist(req.user, name);
   }
 
   @Delete(':id')
-  deletePlaylist(@Request() req, @Param('id', ParseIntPipe) id: number): any {
-    return this.playlistsService.deletePlaylist(req.user,id);
+  async deletePlaylist(
+    @Request() req,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<any> {
+    return await this.playlistsService.deletePlaylist(req.user, id);
   }
 
   @Post(':id')
-  addSongsInPlaylist(
+  async addSongsInPlaylist(
     @Param('id', ParseIntPipe) id: number,
     @Query('song', ParseIntPipe) song: number,
-  ): any {
-    return this.playlistsService.addSongsInPlaylist(id, song);
+  ): Promise<any> {
+    return await this.playlistsService.addSongsInPlaylist(id, song);
   }
 
   @Get(':id')
-  getSongsInPlaylist(@Param('id') id: string): any {
-    return this.playlistsService.getSongsFromPlaylist(id);
+  async getSongsInPlaylist(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<any> {
+    return await this.playlistsService.getSongsFromPlaylist(id);
   }
 
   @Post('remove/:id')
-  removeSongFromPlaylist(
+  async removeSongFromPlaylist(
     @Param('id', ParseIntPipe) id: number,
-    @Query('song') song,
-  ): any {
-    return this.playlistsService.removeSongsFromPlaylist(id, song);
+    @Query('song', ParseIntPipe) song: number,
+  ): Promise<any> {
+    return await this.playlistsService.removeSongsFromPlaylist(id, song);
   }
 }
