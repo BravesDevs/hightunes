@@ -1,10 +1,10 @@
 import { Column, Entity, Index, OneToMany } from 'typeorm';
 import { Playlist } from './playlists.entity';
 
-@Index('unique_username', ['name'], { unique: true })
 @Index('IDX_065d4d8f3b5adb4a08841eae3c', ['name'], { unique: true })
-@Index('user_unique_email', ['email'], { unique: true })
 @Index('IDX_e12875dfb3b1d92d7d7c5377e2', ['email'], { unique: true })
+@Index('unique_username', ['name'], { unique: true })
+@Index('user_unique_email', ['email'], { unique: true })
 @Entity('user')
 export class User {
   @Column('decimal', { primary: true, name: 'id', precision: 10, scale: 0 })

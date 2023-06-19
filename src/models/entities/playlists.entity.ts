@@ -1,5 +1,13 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { User } from './users.entity';
+import { PlaylistSongs } from './playlistSongs.entity';
 
 @Index('playlist_user_id_fk', ['associatedWith'], {})
 @Entity('playlist')
@@ -42,4 +50,7 @@ export class Playlist {
   })
   @JoinColumn([{ name: 'associatedWith', referencedColumnName: 'id' }])
   associatedWith2: User;
+
+  @OneToMany(() => PlaylistSongs, (playlistSongs) => playlistSongs.playlist)
+  playlistSongs: PlaylistSongs[];
 }
