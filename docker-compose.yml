@@ -7,48 +7,47 @@ services:
     container_name: api
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./Dockerfile
 
     # restart: never
     ports:
-      - '3000:3000'
+      - 3000:3000
 
     expose:
-      - '3000'
+      - 3000
 
     volumes:
       - api-volume:/app/data/audio
 
     environment:
-      - JWT_SECRET='C8oQahqQMSbddW1GE5epPhHKHjbumwvx'
+      - JWT_SECRET=C8oQahqQMSbddW1GE5epPhHKHjbumwvx
       - SALT_ROUNDS=10
-      - DATABASE_HOST=172.17.0.3
+      - DATABASE_HOST=db
       - DATABASE_PORT=3306
-      - DATABASE_USER='root'
-      - DATABASE_PASSWORD='root'
-      - DATABASE_NAME='hightunes'
-    # stdin_open: true
-    # tty: true
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=root
+      - DATABASE_NAME=hightunes
+    stdin_open: true
+    tty: true
+    depends_on:
+      - db
 
-    #   depends_on:
-    #     - db
-
-    # db:
-    #   image: mysql:latest # use latest version of mysql
-    #   container_name: db # add a name for the container
-    #   command: --default-authentication-plugin=mysql_native_password
-    #   # restart: unless-stopped
-    #   environment:
-    #     - MYSQL_USER='root'
-    #     - MYSQL_ROOT_PASSWORD='root'
-    #     - MYSQL_PASSWORD='root'
-    #     - MYSQL_DATABASE='hightunes' # create this database on startup
-    #   volumes:
-    #     - mysql-volume:/var/lib/mysql
-    #   ports:
-    #     - '3306:3306'
+  db:
+    image: mysql:latest # use latest version of mysql
+    container_name: db # add a name for the container
+    command: --default-authentication-plugin=mysql_native_password
+    # restart: unless-stopped
+    environment:
+      - MYSQL_USER=root
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - mysql-volume:/var/lib/mysql
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
 
 volumes:
-  # mysql-volume:
-  #   external: true
+  mysql-volume:
+    external: true
   api-volume:
