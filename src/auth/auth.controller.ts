@@ -32,5 +32,4 @@ export class AuthController {
   async me(@Request() req): Promise<any> {
     return await this.authService.me(req.user);
   }
-
 }

@@ -27,6 +27,10 @@ export class AuthGuard implements CanActivate {
         secret: process.env.JWT_SECRET,
       });
 
+      if (!userData.isVerified) {
+        throw new UnauthorizedException('Email not verified!');
+      }
+
       request['user'] = userData;
     } catch (error) {
       if (error instanceof UnauthorizedException) {
