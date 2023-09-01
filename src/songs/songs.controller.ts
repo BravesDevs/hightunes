@@ -8,12 +8,14 @@ import {
   Post,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import type { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('songs')
 export class SongsController {
@@ -37,6 +39,7 @@ export class SongsController {
   }
 
   @Post('add')
+  // @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async addSong(
     @UploadedFile(

@@ -11,7 +11,8 @@ import { DataSource, Repository } from 'typeorm';
 import { Song } from '../models';
 
 import { SongEnum } from 'common';
-import { generateId } from 'utils/helpers';
+import { generateId, uploadToCloudStorage } from 'utils/helpers';
+
 @Injectable()
 export class SongsService {
   constructor(
@@ -49,6 +50,7 @@ export class SongsService {
 
   async addSong(file: Express.Multer.File) {
     try {
+      // Song already exists
       let song = await this.songRepository.findOne({
         where: { name: file.originalname },
       });
@@ -57,18 +59,21 @@ export class SongsService {
         throw new ForbiddenException('Song already exists');
       }
 
+      // Upload to cloud storage
+      let upload: any = await uploadToCloudStorage(file);
+      if (!upload) {
+        throw new InternalServerErrorException('Upload Failed');
+      }
+
+      // Save to database
       let result = await this.songRepository.save({
         id: generateId(),
         name: file.originalname,
         fileSize: file.size,
         format: SongEnum[file.mimetype],
         createdAt: new Date(),
+        resourceUrl: upload.data.url,
       });
-
-      let writeStream = createWriteStream(`./data/audio/${file.originalname}`);
-      writeStream.write(file.buffer);
-      writeStream.end();
-
       return result;
     } catch (error) {
       if (error instanceof ForbiddenException) {
