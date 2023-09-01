@@ -12,15 +12,13 @@ export const generatePasswordHash = (password: string): string => {
   return bcrypt.hashSync(password, salt);
 };
 
-
 export const uploadToCloudStorage = async (file: Express.Multer.File) => {
   try {
     const storage = new Storage({
       keyFilename: path.join(__dirname, '../../key.json'),
-      projectId: 'hitunes-core',
+      projectId: process.env.PROJECT_ID,
     });
     const bucket = storage.bucket(process.env.BUCKET_NAME);
-
     return new Promise((resolve, reject) => {
       const blob = bucket.file(file.originalname);
       const blobStream = blob.createWriteStream({
