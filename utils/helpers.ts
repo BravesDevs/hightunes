@@ -1,4 +1,6 @@
+import { StreamableFile } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { createReadStream } from 'fs';
 import * as path from 'path';
 const { Storage } = require('@google-cloud/storage');
 
@@ -41,6 +43,23 @@ export const uploadToCloudStorage = async (file: Express.Multer.File) => {
       });
       blobStream.end(file.buffer);
     });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getSongFromCloudStorage = async (
+  name: string,
+): Promise<StreamableFile> => {
+  try {
+    const storage = new Storage({
+      keyFilename: path.join(__dirname, '../../key.json'),
+      projectId: process.env.PROJECT_ID,
+    });
+    const bucket = storage.bucket(process.env.BUCKET_NAME);
+    const blob = bucket.file(name);
+    const blobStream = blob.createReadStream();
+    return new StreamableFile(blobStream);
   } catch (error) {
     throw error;
   }

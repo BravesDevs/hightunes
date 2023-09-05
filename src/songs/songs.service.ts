@@ -11,7 +11,7 @@ import { DataSource, Repository } from 'typeorm';
 import { Song } from '../models';
 
 import { SongEnum } from 'common';
-import { generateId, uploadToCloudStorage } from 'utils/helpers';
+import { generateId, getSongFromCloudStorage, uploadToCloudStorage } from 'utils/helpers';
 
 @Injectable()
 export class SongsService {
@@ -26,8 +26,13 @@ export class SongsService {
       where: { id },
     });
 
-    let readStream = createReadStream(`./data/audio/${song.name}`);
-    return new StreamableFile(readStream);
+    if (!song) {
+      throw new ForbiddenException('Song not found');
+    }
+
+    let file = await getSongFromCloudStorage(song.name);
+    return file;
+   
   }
   async getSongInfo(id): Promise<any> {
     return await this.songRepository.findOne({
