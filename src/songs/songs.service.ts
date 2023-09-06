@@ -11,7 +11,11 @@ import { DataSource, Repository } from 'typeorm';
 import { Song } from '../models';
 
 import { SongEnum } from 'common';
-import { generateId, getSongFromCloudStorage, uploadToCloudStorage } from 'utils/helpers';
+import {
+  generateId,
+  getSongFromCloudStorage,
+  uploadToCloudStorage,
+} from 'utils/helpers';
 
 @Injectable()
 export class SongsService {
@@ -32,7 +36,6 @@ export class SongsService {
 
     let file = await getSongFromCloudStorage(song.name);
     return file;
-   
   }
   async getSongInfo(id): Promise<any> {
     return await this.songRepository.findOne({

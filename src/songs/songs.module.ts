@@ -11,10 +11,11 @@ import { SetHeaderMiddleware } from 'common/middleware/setheader.middleware';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Song } from '../models';
 import { PlaylistsModule } from 'src/playlists/playlists.module';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Song]), forwardRef(() => PlaylistsModule)],
-  providers: [SongsService],
+  providers: [SongsService, JwtService],
   controllers: [SongsController],
   exports: [TypeOrmModule]
 })

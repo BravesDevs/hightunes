@@ -39,7 +39,7 @@ export class SongsController {
   }
 
   @Post('add')
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async addSong(
     @UploadedFile(
