@@ -8,16 +8,15 @@ import {
 import { SongsService } from './songs.service';
 import { SongsController } from './songs.controller';
 import { SetHeaderMiddleware } from 'common/middleware/setheader.middleware';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Song } from '../models';
+// import { Song } from '../models';
 import { PlaylistsModule } from 'src/playlists/playlists.module';
 import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Song]), forwardRef(() => PlaylistsModule)],
+  // imports: [TypeOrmModule.forFeature([Song]), forwardRef(() => PlaylistsModule)],
   providers: [SongsService, JwtService],
   controllers: [SongsController],
-  exports: [TypeOrmModule]
+  // exports: [TypeOrmModule],
 })
 export class SongsModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

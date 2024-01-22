@@ -23,19 +23,19 @@ export class SongsController {
 
   @Get('play/:id')
   async getSong(@Param('id') id, @Res({ passthrough: true }) res: Response) {
-    return await this.songsService.getSong(id);
+    // return await this.songsService.getSong(id);
   }
   @Get('info/:id')
   async getSongInfo(
     @Param('id') id,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return { data: await this.songsService.getSongInfo(id) };
+    // return { data: await this.songsService.getSongInfo(id) };
   }
 
   @Get()
   async getSongs() {
-    return await this.songsService.getSongs();
+    // return await this.songsService.getSongs();
   }
 
   @Post('add')
@@ -49,6 +49,6 @@ export class SongsController {
     )
     file: Express.Multer.File,
   ): Promise<any> {
-    return await this.songsService.addSong(file);
+    // return await this.songsService.addSong(file);
   }
 }

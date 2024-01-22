@@ -19,7 +19,7 @@ export class PlaylistsController {
 
   @Get()
   async getPlaylists(@Request() req): Promise<any> {
-    return await this.playlistsService.getPlaylists(req.user);
+    // return await this.playlistsService.getPlaylists(req.user);
   }
 
   @Post()
@@ -27,7 +27,7 @@ export class PlaylistsController {
     @Request() req,
     @Query('name') name: string,
   ): Promise<any> {
-    return await this.playlistsService.createPlaylist(req.user, name);
+    // return await this.playlistsService.createPlaylist(req.user, name);
   }
 
   @Delete(':id')
@@ -35,7 +35,7 @@ export class PlaylistsController {
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<any> {
-    return await this.playlistsService.deletePlaylist(req.user, id);
+    // return await this.playlistsService.deletePlaylist(req.user, id);
   }
 
   @Post(':id')
@@ -43,14 +43,14 @@ export class PlaylistsController {
     @Param('id', ParseIntPipe) id: number,
     @Query('song', ParseIntPipe) song: number,
   ): Promise<any> {
-    return await this.playlistsService.addSongsInPlaylist(id, song);
+    // return await this.playlistsService.addSongsInPlaylist(id, song);
   }
 
   @Get(':id')
   async getSongsInPlaylist(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<any> {
-    return await this.playlistsService.getSongsFromPlaylist(id);
+    // return await this.playlistsService.getSongsFromPlaylist(id);
   }
 
   @Post('remove/:id')
@@ -58,6 +58,6 @@ export class PlaylistsController {
     @Param('id', ParseIntPipe) id: number,
     @Query('song', ParseIntPipe) song: number,
   ): Promise<any> {
-    return await this.playlistsService.removeSongsFromPlaylist(id, song);
+    // return await this.playlistsService.removeSongsFromPlaylist(id, song);
   }
 }
