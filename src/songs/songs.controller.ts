@@ -23,7 +23,7 @@ export class SongsController {
 
   @Get('play/:id')
   async getSong(@Param('id') id, @Res({ passthrough: true }) res: Response) {
-    // return await this.songsService.getSong(id);
+    return await this.songsService.getSong(id);
   }
   @Get('info/:id')
   async getSongInfo(
@@ -42,13 +42,11 @@ export class SongsController {
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async addSong(
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [new FileTypeValidator({ fileType: 'audio/mpeg' })],
-      }),
-    )
+    @UploadedFile(new ParseFilePipe({ fileIsRequired: true }))
     file: Express.Multer.File,
+    @Body()
+    data,
   ): Promise<any> {
-    // return await this.songsService.addSong(file);
+    return await this.songsService.addSong(JSON.parse(data.data), file);
   }
 }

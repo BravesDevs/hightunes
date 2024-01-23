@@ -11,12 +11,11 @@ import { SetHeaderMiddleware } from 'common/middleware/setheader.middleware';
 // import { Song } from '../models';
 import { PlaylistsModule } from 'src/playlists/playlists.module';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'src/prisma.service';
 
 @Module({
-  // imports: [TypeOrmModule.forFeature([Song]), forwardRef(() => PlaylistsModule)],
-  providers: [SongsService, JwtService],
+  providers: [PrismaService, SongsService, JwtService],
   controllers: [SongsController],
-  // exports: [TypeOrmModule],
 })
 export class SongsModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

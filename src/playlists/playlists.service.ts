@@ -13,8 +13,6 @@ import { generateId } from 'utils/helpers';
 import { PlaylistSongs } from 'src/models/entities/playlistSongs.entity';
 let fs = require('fs');
 
-let albums = JSON.parse(fs.readFileSync('./data/audio/albums.json', 'utf8'));
-
 @Injectable()
 export class PlaylistsService {
   private songs: any[] = [];
