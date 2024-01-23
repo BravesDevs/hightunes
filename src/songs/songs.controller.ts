@@ -22,8 +22,8 @@ export class SongsController {
   constructor(private readonly songsService: SongsService) {}
 
   @Get('play/:id')
-  async getSong(@Param('id') id, @Res({ passthrough: true }) res: Response) {
-    return await this.songsService.getSong(id);
+  async playSong(@Param('id') id, @Res({ passthrough: true }) res: Response) {
+    return await this.songsService.playSong(parseInt(id));
   }
   @Get('info/:id')
   async getSongInfo(
@@ -35,7 +35,7 @@ export class SongsController {
 
   @Get()
   async getSongs() {
-    // return await this.songsService.getSongs();
+    return await this.songsService.getSongs();
   }
 
   @Post('add')
