@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   StreamableFile,
 } from '@nestjs/common';
 import { Song } from '@prisma/client';
@@ -14,7 +15,7 @@ import { PrismaService } from 'src/prisma.service';
 export class SongsService {
   constructor(private prisma: PrismaService) {}
 
-  async getSong(id): Promise<StreamableFile> {
+  async playSong(id): Promise<StreamableFile> {
     let song = await this.prisma.song.findUnique({
       where: { id },
     });
@@ -23,7 +24,11 @@ export class SongsService {
       throw new ForbiddenException('Song not found');
     }
 
-    let file = await getSongFromLocal(song.name);
+    let file = await getSongFromLocal(song.id);
+
+    if (!file) {
+      throw new NotFoundException('Song unavailable');
+    }
 
     return file;
   }
@@ -31,6 +36,10 @@ export class SongsService {
   async getSongInfo(id): Promise<Song> {
     let song = await this.prisma.song.findUnique({
       where: { id },
+      include: {
+        Artist: true,
+        Album: true,
+      },
     });
 
     if (!song) {

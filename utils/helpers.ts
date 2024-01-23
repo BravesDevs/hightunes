@@ -15,10 +15,10 @@ export const generatePasswordHash = (password: string): string => {
 };
 
 export const getSongFromLocal = async (
-  name: string,
+  name: string | number,
 ): Promise<StreamableFile> => {
   try {
-    const file = createReadStream(path.join(__dirname, `../data/${name}`));
+    const file = createReadStream(path.join(__dirname, `../../data/${name}`));
     return new StreamableFile(file);
   } catch (error) {
     throw error;
