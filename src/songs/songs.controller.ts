@@ -30,7 +30,7 @@ export class SongsController {
     @Param('id') id,
     @Res({ passthrough: true }) res: Response,
   ) {
-    // return { data: await this.songsService.getSongInfo(id) };
+    return { data: await this.songsService.getSongInfo(parseInt(id)) };
   }
 
   @Get()

@@ -36,6 +36,10 @@ export class SongsService {
   async getSongInfo(id): Promise<Song> {
     let song = await this.prisma.song.findUnique({
       where: { id },
+      include: {
+        Artist: true,
+        Album: true,
+      },
     });
 
     if (!song) {
