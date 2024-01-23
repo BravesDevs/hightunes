@@ -4,29 +4,18 @@ import {
   InternalServerErrorException,
   StreamableFile,
 } from '@nestjs/common';
-import { createReadStream, createWriteStream } from 'fs';
-let fs = require('fs');
-import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
-import { Song } from '../models';
+import { Song } from '@prisma/client';
 
-import { SongEnum } from 'common';
-import {
-  generateId,
-  getSongFromCloudStorage,
-  uploadToCloudStorage,
-} from 'utils/helpers';
+import { generateId, setSongToLocal, getSongFromLocal } from 'utils/helpers';
+
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class SongsService {
-  constructor(
-    @InjectRepository(Song)
-    private songRepository: Repository<Song>,
-    private dataSource: DataSource,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async getSong(id): Promise<StreamableFile> {
-    let song = await this.songRepository.findOne({
+    let song = await this.prisma.song.findUnique({
       where: { id },
     });
 
@@ -34,54 +23,59 @@ export class SongsService {
       throw new ForbiddenException('Song not found');
     }
 
-    let file = await getSongFromCloudStorage(song.name);
+    let file = await getSongFromLocal(song.name);
+
     return file;
   }
-  async getSongInfo(id): Promise<any> {
-    return await this.songRepository.findOne({
+
+  async getSongInfo(id): Promise<Song> {
+    let song = await this.prisma.song.findUnique({
       where: { id },
     });
+
+    if (!song) {
+      throw new ForbiddenException('Song not found');
+    }
+
+    return song;
   }
 
-  async getSongs(): Promise<any> {
+  async getSongs(): Promise<Song[]> {
     try {
-      return {
-        data: await this.dataSource
-          .getRepository(Song)
-          .createQueryBuilder('song')
-          .getMany(),
-      };
+      let songs = await this.prisma.song.findMany();
+      return songs;
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong');
     }
   }
 
-  async addSong(file: Express.Multer.File) {
+  async addSong(data, file: Express.Multer.File) {
     try {
       // Song already exists
-      let song = await this.songRepository.findOne({
+
+      let song = await this.prisma.song.findMany({
         where: { name: file.originalname },
       });
 
-      if (song) {
+      if (song.length > 0) {
         throw new ForbiddenException('Song already exists');
       }
 
-      // Upload to cloud storage
-      let upload: any = await uploadToCloudStorage(file);
-      if (!upload) {
-        throw new InternalServerErrorException('Upload Failed');
-      }
-
       // Save to database
-      let result = await this.songRepository.save({
-        id: generateId(),
-        name: file.originalname,
-        fileSize: file.size,
-        format: SongEnum[file.mimetype],
-        createdAt: new Date(),
-        resourceUrl: upload.data.url,
+
+      let result = await this.prisma.song.create({
+        data: {
+          id: generateId(),
+          name: file.originalname,
+          createdAt: new Date(),
+          artistId: data.artist,
+          duration: data.duration,
+          albumId: data.albumId || 1,
+        },
       });
+
+      setSongToLocal(result.id, file);
+
       return result;
     } catch (error) {
       if (error instanceof ForbiddenException) {

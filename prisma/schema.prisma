@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Playlists Playlist[]
+}
+
+// model Playlist {
+//   id        Int      @id @default(autoincrement())
+//   name      String
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   userId Int
+//   User   User @relation(fields: [userId], references: [id])
+
+//   Songs Song[]
+// }
+
+model Song {
+  id        Int      @id @default(autoincrement())
+  name      String
+  duration  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  albumId Int
+  Album   Album @relation(fields: [albumId], references: [id])
+
+  artistId Int
+  Artist   Artist @relation(fields: [artistId], references: [id])
+
+  // Playlists Playlist[]
+}
+
+model Album {
+  id        Int      @id @default(autoincrement())
+  name      String
+  artist    String
+  cover     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Songs Song[]
+
+  artistId Int
+  Artist   Artist @relation(fields: [artistId], references: [id])
+}
+
+model Artist {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  countryId Int
+  Country   Country @relation(fields: [countryId], references: [id])
+
+  Songs  Song[]
+  Albums Album[]
+}
+
+model Country {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  artists   Artist[]
+}

@@ -3,22 +3,19 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../models';
-import { DataSource, Repository } from 'typeorm';
 
 import { generateId, generatePasswordHash } from 'utils/helpers';
+import { PrismaService } from '../prisma.service';
+import { User } from '@prisma/client';
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
-    private dataSource: DataSource,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async getUserByEmail(email: string): Promise<User> {
-    return await this.userRepository.findOne({
-      where: { email },
+    return this.prisma.user.findFirst({
+      where: {
+        email,
+      },
     });
   }
 
@@ -26,12 +23,17 @@ export class UsersService {
     try {
       data.password = generatePasswordHash(data.password);
 
-      const user = this.userRepository.create({
-        id: generateId(),
-        ...data,
+      const user = await this.prisma.user.create({
+        data: {
+          id: generateId(),
+          email: data.email,
+          password: data.password,
+          name: data.name,
+          updatedAt: new Date(),
+        },
       });
 
-      return await this.userRepository.save(user);
+      return user;
     } catch (error) {
       if (error.errno === 1062) {
         throw new ForbiddenException('User already exists');
