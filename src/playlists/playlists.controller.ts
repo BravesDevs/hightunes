@@ -19,7 +19,7 @@ export class PlaylistsController {
 
   @Get()
   async getPlaylists(@Request() req): Promise<any> {
-    // return await this.playlistsService.getPlaylists(req.user);
+    return await this.playlistsService.getPlaylists(req.user);
   }
 
   @Post()
